@@ -14,7 +14,20 @@ const MEGABYTE = 1024*1024
 
 
 func Hello(w http.ResponseWriter, req *http.Request) { 
-    io.WriteString(w, "hello, world!\n") 
+    io.WriteString(w, `
+<html>
+<head><title>HTTP Flood Server </title></head>
+<body>
+<h1>HTTP Flood Server</h1>
+<ul>
+ <li><a href="/flood?m=1">1 megabyte file</a></li>
+ <li><a href="/flood?m=10">10 megabyte file</a></li>
+ <li><a href="/flood?m=100">100 megabyte file</a></li>
+ <li><a href="/flood?m=1024">1 gigabyte file</a></li>
+ <li><a href="/flood?m=10240">10 gigabyte file</a></li>
+</ul>
+</body>
+</html>`)
 } 
 
 func Flood(w http.ResponseWriter, req *http.Request) { 
