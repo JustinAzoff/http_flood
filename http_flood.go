@@ -41,7 +41,7 @@ func Flood(w http.ResponseWriter, req *http.Request) {
     if ms == "" {
         ms = "1"
     }
-    m, err := strconv.Atoi(ms)
+    m, err := strconv.ParseUint(ms, 10, 0)
     if err != nil  {
         m = 1
     }
@@ -49,9 +49,10 @@ func Flood(w http.ResponseWriter, req *http.Request) {
     fmt.Printf("flood starting addr=%s\n", req.RemoteAddr)
     start := time.Now()
     status := "finished"
-    written := 0
+    var written uint64 = 0
 
-    w.Header().Set("Content-length", strconv.Itoa(m*MEGABYTE))
+    fmt.Println(uint64(m)*MEGABYTE)
+    w.Header().Set("Content-length", strconv.FormatUint(m*MEGABYTE, 10))
     for ; written < m*MEGABYTE; written += blocksize{
         _, err := w.Write(random_bytes)
         if err != nil {
