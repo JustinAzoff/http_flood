@@ -50,6 +50,8 @@ func Flood(w http.ResponseWriter, req *http.Request) {
     start := time.Now()
     status := "finished"
     written := 0
+
+    w.Header().Set("Content-length", strconv.Itoa(m*MEGABYTE))
     for ; written < m*MEGABYTE; written += blocksize{
         _, err := w.Write(random_bytes)
         if err != nil {
