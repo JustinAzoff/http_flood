@@ -51,7 +51,6 @@ func Flood(w http.ResponseWriter, req *http.Request) {
     status := "finished"
     var written uint64 = 0
 
-    fmt.Println(uint64(m)*MEGABYTE)
     w.Header().Set("Content-length", strconv.FormatUint(m*MEGABYTE, 10))
     for ; written < m*MEGABYTE; written += blocksize{
         _, err := w.Write(random_bytes)
