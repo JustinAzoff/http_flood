@@ -1,19 +1,19 @@
 package main
+
 import (
-    "net/http"
+    "crypto/rand"
     "fmt"
     "io"
-    "time"
-    "crypto/rand"
+    "net/http"
     "runtime"
     "strconv"
+    "time"
 )
 
-const blocksize = 8*1024
-const MEGABYTE = 1024*1024
+const blocksize = 8 * 1024
+const MEGABYTE = 1024 * 1024
 
-
-func Hello(w http.ResponseWriter, req *http.Request) { 
+func Hello(w http.ResponseWriter, req *http.Request) {
     io.WriteString(w, `
 <html>
 <head><title>HTTP Flood Server </title></head>
@@ -28,9 +28,9 @@ func Hello(w http.ResponseWriter, req *http.Request) {
 </ul>
 </body>
 </html>`)
-} 
+}
 
-func Flood(w http.ResponseWriter, req *http.Request) { 
+func Flood(w http.ResponseWriter, req *http.Request) {
     random_bytes := make([]byte, blocksize)
     _, err := rand.Read(random_bytes)
     if err != nil {
@@ -42,31 +42,31 @@ func Flood(w http.ResponseWriter, req *http.Request) {
         ms = "1"
     }
     m, err := strconv.ParseUint(ms, 10, 0)
-    if err != nil  {
+    if err != nil {
         m = 1
     }
-        
+
     fmt.Printf("flood starting addr=%s\n", req.RemoteAddr)
     start := time.Now()
     status := "finished"
     var written uint64 = 0
 
     w.Header().Set("Content-length", strconv.FormatUint(m*MEGABYTE, 10))
-    for ; written < m*MEGABYTE; written += blocksize{
+    for ; written < m*MEGABYTE; written += blocksize {
         _, err := w.Write(random_bytes)
         if err != nil {
             status = "aborted"
-            break;
+            break
         }
         runtime.Gosched()
     }
     duration := time.Since(start)
-    megabytes := float64(written)/MEGABYTE
-    mbs := megabytes/duration.Seconds()
+    megabytes := float64(written) / MEGABYTE
+    mbs := megabytes / duration.Seconds()
     fmt.Printf("flood %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, req.RemoteAddr, duration, megabytes, mbs)
-} 
+}
 
-func main() { 
+func main() {
     myHandler := http.NewServeMux()
     s := &http.Server{
         Addr:           ":7070",
@@ -75,8 +75,8 @@ func main() {
         WriteTimeout:   60 * time.Second,
         MaxHeaderBytes: 1 << 20,
     }
-    myHandler.HandleFunc("/", Hello) 
-    myHandler.HandleFunc("/flood", Flood) 
+    myHandler.HandleFunc("/", Hello)
+    myHandler.HandleFunc("/flood", Flood)
     fmt.Println("Listening on port 7070")
     s.ListenAndServe()
-} 
+}
