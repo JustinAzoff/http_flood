@@ -2,6 +2,7 @@ package main
 
 import (
     "crypto/rand"
+    "flag"
     "fmt"
     "io"
     "net/http"
@@ -67,9 +68,12 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+    var port int
+    flag.IntVar(&port, "port", 7070, "Port to bind to")
+    flag.Parse()
     myHandler := http.NewServeMux()
     s := &http.Server{
-        Addr:           ":7070",
+        Addr:           fmt.Sprintf(":%d", port),
         Handler:        myHandler,
         ReadTimeout:    10 * time.Second,
         WriteTimeout:   60 * time.Second,
@@ -77,6 +81,6 @@ func main() {
     }
     myHandler.HandleFunc("/", Hello)
     myHandler.HandleFunc("/flood", Flood)
-    fmt.Println("Listening on port 7070")
+    fmt.Printf("Listening on port %d\n", port)
     s.ListenAndServe()
 }
