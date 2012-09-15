@@ -68,6 +68,7 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+    runtime.GOMAXPROCS(runtime.NumCPU())
     var port int
     flag.IntVar(&port, "port", 7070, "Port to bind to")
     flag.Parse()
