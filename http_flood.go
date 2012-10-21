@@ -47,7 +47,7 @@ func Flood(w http.ResponseWriter, req *http.Request) {
         m = 1
     }
 
-    fmt.Printf("flood starting addr=%s\n", req.RemoteAddr)
+    fmt.Printf("flood starting addr=%s megs=%d\n", req.RemoteAddr, m)
     start := time.Now()
     status := "finished"
     var written uint64 = 0
