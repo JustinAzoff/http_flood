@@ -9,13 +9,15 @@ import (
     "runtime"
     "strconv"
     "time"
+    "html/template"
 )
 
 const blocksize = 8 * 1024
 const MEGABYTE = 1024 * 1024
 
-func Hello(w http.ResponseWriter, req *http.Request) {
-    io.WriteString(w, `
+var connections = make(map[*http.Request]bool)
+
+var indexTemplate = template.Must(template.New("").Parse(`
 <html>
 <head><title>HTTP Flood Server </title></head>
 <body>
@@ -28,10 +30,17 @@ func Hello(w http.ResponseWriter, req *http.Request) {
  <li><a href="/flood?m=10240">10 gigabyte file</a></li>
 </ul>
 </body>
-</html>`)
+<p> Current connections: {{.}} </p>
+</html>`))
+
+func Hello(w http.ResponseWriter, req *http.Request) {
+    indexTemplate.Execute(w, len(connections))
 }
 
 func Flood(w http.ResponseWriter, req *http.Request) {
+    connections[req] = true
+    defer delete(connections, req)
+
     random_bytes := make([]byte, blocksize)
     _, err := rand.Read(random_bytes)
     if err != nil {
@@ -68,6 +77,9 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 }
 
 func Upload(w http.ResponseWriter, req *http.Request) {
+    connections[req] = true
+    defer delete(connections, req)
+
     buf := make([]byte, blocksize)
     fmt.Printf("upload starting addr=%s\n", req.RemoteAddr)
     start := time.Now()
