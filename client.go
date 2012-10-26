@@ -17,7 +17,7 @@ func download(host string, megs int) {
     buffer := make([]byte, blocksize)
     url := fmt.Sprintf("http://%s/flood?m=%d", host, megs)
 
-    read := 0
+    var read uint64 = 0
     start := time.Now()
     resp, err := http.Get(url)
     defer resp.Body.Close()
@@ -32,7 +32,7 @@ func download(host string, megs int) {
             }
             break
         }
-        read += n
+        read += uint64(n)
 
     }
     duration := time.Since(start)
