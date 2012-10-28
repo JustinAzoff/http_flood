@@ -84,7 +84,10 @@ func (r *LoopReader) Read(p []byte) (n int, err error) {
 func upload(host string, megs int) {
 	url := fmt.Sprintf("http://%s/upload?m=%d", host, megs)
 
-	resp, _ := http.Post(url, "application/octet-stream", NewLooper(megs))
+	resp, err := http.Post(url, "application/octet-stream", NewLooper(megs))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	io.Copy(os.Stdout, resp.Body)
 }
