@@ -62,9 +62,8 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 	fmt.Printf("flood starting addr=%s megabytes=%d\n", req.RemoteAddr, m)
 	start := time.Now()
 	status := "finished"
-	randReader := common.NewRandomGen(m)
 	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
-	written, err := io.Copy(w, randReader)
+	written, err := io.Copy(w, common.NewRandomGen(m))
 
 	if err != nil {
 		status = "aborted"
