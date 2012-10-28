@@ -12,7 +12,7 @@ type RandomGen struct {
 	size uint64
 }
 
-func NewRandomGen(megs int) *RandomGen {
+func NewRandomGen(megs uint64) *RandomGen {
 	random_bytes := make([]byte, consts.Blocksize)
 	_, err := rand.Read(random_bytes)
 	if err != nil {
