@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const blocksize = 32  * 1024
+const blocksize = 32 * 1024
 const MEGABYTE = 1024 * 1024
 
 func download(host string, megs int) {
