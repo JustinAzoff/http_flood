@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"runtime"
 	"strconv"
@@ -98,12 +99,11 @@ func Upload(w http.ResponseWriter, req *http.Request) {
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
-	var port int
-	flag.IntVar(&port, "port", 7070, "Port to bind to")
+	addr := flag.String("addr", ":7070", "Address to bind to")
 	flag.Parse()
 	myHandler := http.NewServeMux()
 	s := &http.Server{
-		Addr:           fmt.Sprintf(":%d", port),
+		Addr:           *addr,
 		Handler:        myHandler,
 		ReadTimeout:    60 * time.Second,
 		WriteTimeout:   60 * time.Second,
@@ -112,6 +112,6 @@ func main() {
 	myHandler.HandleFunc("/", Hello)
 	myHandler.HandleFunc("/flood", Flood)
 	myHandler.HandleFunc("/upload", Upload)
-	fmt.Printf("Listening on port %d\n", port)
-	s.ListenAndServe()
+	fmt.Printf("Listening on %s\n", *addr)
+	log.Fatal(s.ListenAndServe())
 }

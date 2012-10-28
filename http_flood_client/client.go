@@ -47,13 +47,11 @@ func upload(host string, megs int) {
 }
 
 func main() {
-	var megabytes int
-	var host string
-	flag.IntVar(&megabytes, "megs", 1024, "megabytes to download")
-	flag.StringVar(&host, "host", "localhost:7070", "Host to connect to")
+	megabytes := flag.Int("megs", 1024, "megabytes to download")
+	host := flag.String("host", "localhost:7070", "Host to connect to")
 	flag.Parse()
 
-	download(host, megabytes)
-	upload(host, megabytes)
+	download(*host, *megabytes)
+	upload(*host, *megabytes)
 
 }
