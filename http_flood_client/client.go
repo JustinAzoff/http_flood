@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func download(host string, megs int) {
+func download(host string, megs uint64) {
 	status := "finished"
 	url := fmt.Sprintf("http://%s/flood?m=%d", host, megs)
 
@@ -35,7 +35,7 @@ func download(host string, megs int) {
 	fmt.Printf("download %s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, duration, megabytes, mbs)
 }
 
-func upload(host string, megs int) {
+func upload(host string, megs uint64) {
 	url := fmt.Sprintf("http://%s/upload?m=%d", host, megs)
 
 	resp, err := http.Post(url, "application/octet-stream", common.NewRandomGen(megs))
@@ -47,7 +47,7 @@ func upload(host string, megs int) {
 }
 
 func main() {
-	megabytes := flag.Int("megs", 1024, "megabytes to download")
+	megabytes := flag.Uint64("megs", 1024, "megabytes to download")
 	host := flag.String("host", "localhost:7070", "Host to connect to")
 	flag.Parse()
 
