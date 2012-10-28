@@ -6,26 +6,26 @@ import (
 	"io"
 )
 
-type LoopReader struct {
+type RandomGen struct {
 	pos  int
 	buf  []byte
 	size uint64
 }
 
-func NewLooper(megs int) *LoopReader {
+func NewRandomGen(megs int) *RandomGen {
 	random_bytes := make([]byte, consts.Blocksize)
 	_, err := rand.Read(random_bytes)
 	if err != nil {
 		return nil
 	}
 
-	return &LoopReader{
+	return &RandomGen{
 		buf:  random_bytes,
 		size: uint64(megs) * consts.Megabyte,
 	}
 }
 
-func (r *LoopReader) Read(p []byte) (n int, err error) {
+func (r *RandomGen) Read(p []byte) (n int, err error) {
 	n = len(p)
 	toread := n
 	if n > len(r.buf) {
