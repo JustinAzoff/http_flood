@@ -2,6 +2,7 @@ package main
 
 import (
 	"../consts"
+    "../common"
 	"crypto/rand"
 	"flag"
 	"fmt"
@@ -57,16 +58,12 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 	fmt.Printf("flood starting addr=%s megabytes=%d\n", req.RemoteAddr, m)
 	start := time.Now()
 	status := "finished"
-	var written uint64 = 0
-
+    randReader := common.NewLooper(int(m))
 	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
-	for ; written < m*consts.Megabyte; written += consts.Blocksize {
-		_, err := w.Write(random_bytes)
-		if err != nil {
-			status = "aborted"
-			break
-		}
-		runtime.Gosched()
+    written, err := io.Copy(w, randReader)
+
+    if err != nil {
+        status = "aborted"
 	}
 	duration := time.Since(start)
 	megabytes := float64(written) / consts.Megabyte
