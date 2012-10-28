@@ -7,7 +7,6 @@ import (
 )
 
 type RandomGen struct {
-	pos  int
 	buf  []byte
 	size uint64
 }
