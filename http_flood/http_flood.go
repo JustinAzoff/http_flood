@@ -54,7 +54,7 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 	start := time.Now()
 	status := "finished"
 	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
-	written, err := io.Copy(w, common.NewRandomGen(m))
+	written, err := io.Copy(w, common.LimitedRandomGen(m*consts.Megabyte))
 
 	if err != nil {
 		status = "aborted"

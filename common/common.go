@@ -7,11 +7,10 @@ import (
 )
 
 type RandomGen struct {
-	buf  []byte
-	size uint64
+	buf []byte
 }
 
-func NewRandomGen(megs uint64) *RandomGen {
+func NewRandomGen() *RandomGen {
 	random_bytes := make([]byte, consts.Blocksize)
 	_, err := rand.Read(random_bytes)
 	if err != nil {
@@ -19,8 +18,7 @@ func NewRandomGen(megs uint64) *RandomGen {
 	}
 
 	return &RandomGen{
-		buf:  random_bytes,
-		size: uint64(megs) * consts.Megabyte,
+		buf: random_bytes,
 	}
 }
 
@@ -30,14 +28,11 @@ func (r *RandomGen) Read(p []byte) (n int, err error) {
 	if n > len(r.buf) {
 		toread = len(r.buf)
 	}
-	if uint64(toread) > r.size {
-		toread = int(r.size)
-	}
-	r.size -= uint64(toread)
 
 	copy(p[0:toread], r.buf[0:toread])
-	if r.size == 0 {
-		return toread, io.EOF
-	}
 	return toread, nil
+}
+
+func LimitedRandomGen(n uint64) io.Reader {
+    return io.LimitReader(NewRandomGen(), int64(n))
 }
