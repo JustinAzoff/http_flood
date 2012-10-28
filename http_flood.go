@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const blocksize = 8 * 1024
+const blocksize = 32 * 1024
 const MEGABYTE = 1024 * 1024
 
 var connections = make(map[*http.Request]bool)
