@@ -22,10 +22,10 @@ func download(host string, megs int) {
 	var read uint64 = 0
 	start := time.Now()
 	resp, err := http.Get(url)
-	defer resp.Body.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer resp.Body.Close()
 	for {
 		n, err := io.ReadAtLeast(resp.Body, buffer, blocksize)
 		if err != nil {
