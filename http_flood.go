@@ -92,7 +92,6 @@ func Upload(w http.ResponseWriter, req *http.Request) {
 		if er != nil {
 			break
 		}
-		runtime.Gosched()
 	}
 	duration := time.Since(start)
 	megabytes := float64(written) / MEGABYTE
