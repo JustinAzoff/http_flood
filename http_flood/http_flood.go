@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"runtime"
@@ -78,19 +79,15 @@ func Upload(w http.ResponseWriter, req *http.Request) {
 	connections[req] = true
 	defer delete(connections, req)
 
-	buf := make([]byte, consts.Blocksize)
 	fmt.Printf("upload starting addr=%s\n", req.RemoteAddr)
 	start := time.Now()
 	status := "finished"
-	var written uint64 = 0
 
-	for {
-		nr, er := req.Body.Read(buf)
-		written += uint64(nr)
-		if er != nil {
-			break
-		}
+	written, err := io.Copy(ioutil.Discard, req.Body)
+	if err != nil {
+		status = "aborted"
 	}
+
 	duration := time.Since(start)
 	megabytes := float64(written) / consts.Megabyte
 	mbs := megabytes / duration.Seconds()
