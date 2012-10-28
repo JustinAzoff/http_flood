@@ -1,6 +1,7 @@
 package main
 
 import (
+	"../consts"
 	"crypto/rand"
 	"flag"
 	"fmt"
@@ -11,12 +12,9 @@ import (
 	"time"
 )
 
-const blocksize = 32 * 1024
-const MEGABYTE = 1024 * 1024
-
 func download(host string, megs int) {
 	status := "finished"
-	buffer := make([]byte, blocksize)
+	buffer := make([]byte, consts.Blocksize)
 	url := fmt.Sprintf("http://%s/flood?m=%d", host, megs)
 
 	var read uint64 = 0
@@ -27,7 +25,7 @@ func download(host string, megs int) {
 	}
 	defer resp.Body.Close()
 	for {
-		n, err := io.ReadAtLeast(resp.Body, buffer, blocksize)
+		n, err := io.ReadAtLeast(resp.Body, buffer, consts.Blocksize)
 		if err != nil {
 			if err != io.EOF {
 				status = "aborted"
@@ -38,7 +36,7 @@ func download(host string, megs int) {
 
 	}
 	duration := time.Since(start)
-	megabytes := float64(read) / MEGABYTE
+	megabytes := float64(read) / consts.Megabyte
 	mbs := megabytes / duration.Seconds()
 
 	fmt.Printf("download %s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, duration, megabytes, mbs)
@@ -51,7 +49,7 @@ type LoopReader struct {
 }
 
 func NewLooper(megs int) *LoopReader {
-	random_bytes := make([]byte, blocksize)
+	random_bytes := make([]byte, consts.Blocksize)
 	_, err := rand.Read(random_bytes)
 	if err != nil {
 		return nil
@@ -59,7 +57,7 @@ func NewLooper(megs int) *LoopReader {
 
 	return &LoopReader{
 		buf:  random_bytes,
-		size: uint64(megs) * MEGABYTE,
+		size: uint64(megs) * consts.Megabyte,
 	}
 }
 
