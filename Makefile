@@ -1,10 +1,10 @@
-all: http_flood client
+all: http_flood/http_flood http_flood_client/http_flood_client
 
-http_flood: http_flood.go
-	go build http_flood.go
+http_flood/http_flood: http_flood/http_flood.go
+	cd http_flood && go build
 
-client: client.go
-	go build client.go
+http_flood_client/http_flood_client: http_flood_client/client.go
+	cd http_flood_client/ && go build
 
-run: http_flood
-	./http_flood
+run: http_flood/http_flood
+	./http_flood/http_flood
