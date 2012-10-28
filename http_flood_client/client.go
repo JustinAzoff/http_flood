@@ -38,7 +38,7 @@ func download(host string, megs uint64) {
 func upload(host string, megs uint64) {
 	url := fmt.Sprintf("http://%s/upload?m=%d", host, megs)
 
-	resp, err := http.Post(url, "application/octet-stream", common.NewRandomGen(megs))
+	resp, err := http.Post(url, "application/octet-stream", common.LimitedRandomGen(megs*consts.Megabyte))
 	if err != nil {
 		log.Fatal(err)
 	}
