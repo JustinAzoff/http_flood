@@ -3,7 +3,6 @@ package main
 import (
 	"../common"
 	"../consts"
-	"crypto/rand"
 	"flag"
 	"fmt"
 	"html/template"
@@ -17,7 +16,6 @@ import (
 )
 
 var connections = make(map[*http.Request]bool)
-var random_bytes = make([]byte, consts.Blocksize)
 
 var indexTemplate = template.Must(template.New("").Parse(`
 <html>
@@ -37,13 +35,6 @@ var indexTemplate = template.Must(template.New("").Parse(`
 
 func Hello(w http.ResponseWriter, req *http.Request) {
 	indexTemplate.Execute(w, len(connections))
-}
-
-func Init() {
-	_, err := rand.Read(random_bytes)
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func Flood(w http.ResponseWriter, req *http.Request) {
@@ -110,7 +101,6 @@ func main() {
 	myHandler.HandleFunc("/", Hello)
 	myHandler.HandleFunc("/flood", Flood)
 	myHandler.HandleFunc("/upload", Upload)
-	Init()
 	fmt.Printf("Listening on %s\n", *addr)
 	log.Fatal(s.ListenAndServe())
 }
