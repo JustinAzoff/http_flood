@@ -1,11 +1,12 @@
 package main
 
 import (
-	"../consts"
 	"../common"
+	"../consts"
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -14,26 +15,18 @@ import (
 
 func download(host string, megs int) {
 	status := "finished"
-	buffer := make([]byte, consts.Blocksize)
 	url := fmt.Sprintf("http://%s/flood?m=%d", host, megs)
 
-	var read uint64 = 0
 	start := time.Now()
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
-	for {
-		n, err := io.ReadAtLeast(resp.Body, buffer, consts.Blocksize)
-		if err != nil {
-			if err != io.EOF {
-				status = "aborted"
-			}
-			break
-		}
-		read += uint64(n)
 
+	read, err := io.Copy(ioutil.Discard, resp.Body)
+	if err != nil {
+		status = "aborted"
 	}
 	duration := time.Since(start)
 	megabytes := float64(read) / consts.Megabyte
