@@ -46,18 +46,26 @@ func upload(host string, megs uint64) {
 	io.Copy(os.Stdout, resp.Body)
 }
 
+func notify(c chan bool, f func()) {
+	f()
+	c <- true
+}
+
 func main() {
 	megabytes := flag.Uint64("megs", 1024, "megabytes to download")
 	host := flag.String("host", "localhost:7070", "Host to connect to")
 	fd := flag.Bool("full", false, "Download and upload at the same time")
 	flag.Parse()
 
-    if *fd {
-        go download(*host, *megabytes)
-        upload(*host, *megabytes)
-    } else {
-        download(*host, *megabytes)
-        upload(*host, *megabytes)
-    }
+	if *fd {
+		c := make(chan bool, 2)
+		go notify(c, func() { download(*host, *megabytes) })
+		go notify(c, func() { upload(*host, *megabytes) })
+		<-c
+		<-c
+	} else {
+		download(*host, *megabytes)
+		upload(*host, *megabytes)
+	}
 
 }
