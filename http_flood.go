@@ -15,7 +15,23 @@ import (
 	"time"
 )
 
-var connections = make(map[*http.Request]bool)
+var connections = 0
+var connectionsChan = make(chan int, 2)
+
+func addConnection() {
+	connectionsChan <- 1
+}
+
+func removeConnection() {
+	connectionsChan <- -1
+}
+
+func connectionTracker() {
+	for {
+		change := <-connectionsChan
+		connections += change
+	}
+}
 
 var indexTemplate = template.Must(template.New("").Parse(`
 <html>
@@ -34,12 +50,12 @@ var indexTemplate = template.Must(template.New("").Parse(`
 </html>`))
 
 func Hello(w http.ResponseWriter, req *http.Request) {
-	indexTemplate.Execute(w, len(connections))
+	indexTemplate.Execute(w, connections)
 }
 
 func Flood(w http.ResponseWriter, req *http.Request) {
-	connections[req] = true
-	defer delete(connections, req)
+	addConnection()
+	defer removeConnection()
 
 	ms := req.FormValue("m")
 	if ms == "" {
@@ -66,8 +82,8 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 }
 
 func Upload(w http.ResponseWriter, req *http.Request) {
-	connections[req] = true
-	defer delete(connections, req)
+	addConnection()
+	defer removeConnection()
 
 	fmt.Printf("upload starting addr=%s\n", req.RemoteAddr)
 	start := time.Now()
@@ -102,5 +118,6 @@ func main() {
 	myHandler.HandleFunc("/flood", Flood)
 	myHandler.HandleFunc("/upload", Upload)
 	fmt.Printf("Listening on %s\n", *addr)
+	go connectionTracker()
 	log.Fatal(s.ListenAndServe())
 }
