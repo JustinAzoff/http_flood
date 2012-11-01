@@ -66,7 +66,7 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 		m = 1
 	}
 
-	fmt.Printf("flood starting addr=%s megabytes=%d\n", req.RemoteAddr, m)
+	log.Printf("flood starting addr=%s megabytes=%d\n", req.RemoteAddr, m)
 	start := time.Now()
 	status := "finished"
 	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
@@ -78,14 +78,14 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 	duration := time.Since(start)
 	megabytes := float64(written) / consts.Megabyte
 	mbs := megabytes / duration.Seconds()
-	fmt.Printf("flood %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, req.RemoteAddr, duration, megabytes, mbs)
+	log.Printf("flood %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, req.RemoteAddr, duration, megabytes, mbs)
 }
 
 func Upload(w http.ResponseWriter, req *http.Request) {
 	addConnection()
 	defer removeConnection()
 
-	fmt.Printf("upload starting addr=%s\n", req.RemoteAddr)
+	log.Printf("upload starting addr=%s\n", req.RemoteAddr)
 	start := time.Now()
 	status := "finished"
 
@@ -98,7 +98,7 @@ func Upload(w http.ResponseWriter, req *http.Request) {
 	megabytes := float64(written) / consts.Megabyte
 	mbs := megabytes / duration.Seconds()
 	message := fmt.Sprintf("upload %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, req.RemoteAddr, duration, megabytes, mbs)
-	fmt.Print(message)
+	log.Print(message)
 	io.WriteString(w, message)
 }
 
@@ -117,7 +117,7 @@ func main() {
 	myHandler.HandleFunc("/", Hello)
 	myHandler.HandleFunc("/flood", Flood)
 	myHandler.HandleFunc("/upload", Upload)
-	fmt.Printf("Listening on %s\n", *addr)
+	log.Printf("Listening on %s\n", *addr)
 	go connectionTracker()
 	log.Fatal(s.ListenAndServe())
 }
