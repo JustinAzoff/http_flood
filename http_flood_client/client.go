@@ -49,9 +49,15 @@ func upload(host string, megs uint64) {
 func main() {
 	megabytes := flag.Uint64("megs", 1024, "megabytes to download")
 	host := flag.String("host", "localhost:7070", "Host to connect to")
+	fd := flag.Bool("full", false, "Download and upload at the same time")
 	flag.Parse()
 
-	download(*host, *megabytes)
-	upload(*host, *megabytes)
+    if *fd {
+        go download(*host, *megabytes)
+        upload(*host, *megabytes)
+    } else {
+        download(*host, *megabytes)
+        upload(*host, *megabytes)
+    }
 
 }
