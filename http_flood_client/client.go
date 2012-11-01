@@ -32,7 +32,7 @@ func download(host string, megs uint64) {
 	megabytes := float64(read) / consts.Megabyte
 	mbs := megabytes / duration.Seconds()
 
-	fmt.Printf("download %s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, duration, megabytes, mbs)
+	log.Printf("download %s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, duration, megabytes, mbs)
 }
 
 func upload(host string, megs uint64) {
