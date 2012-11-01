@@ -1,8 +1,8 @@
 package main
 
 import (
-	"../common"
-	"../consts"
+	"./common"
+	"./consts"
 	"flag"
 	"fmt"
 	"html/template"
