@@ -73,6 +73,8 @@ var indexTemplate = template.Must(template.New("").Parse(`
  <li><a href="/flood?m=100">100 megabyte file</a></li>
  <li><a href="/flood?m=1024">1 gigabyte file</a></li>
  <li><a href="/flood?m=10240">10 gigabyte file</a></li>
+ <li><a href="/flood?s=10">10 seconds</a></li>
+ <li><a href="/flood?s=60">60 seconds</a></li>
 </ul>
 </body>
 <p> Current connections: {{.Connections}} </p>
@@ -87,6 +89,11 @@ func Hello(w http.ResponseWriter, req *http.Request) {
 }
 
 func Flood(w http.ResponseWriter, req *http.Request) {
+	s := req.FormValue("s")
+	if s != "" {
+		TimeFlood(w, req)
+		return
+	}
 	addConnection()
 
 	ms := req.FormValue("m")
@@ -97,13 +104,39 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		m = 1
 	}
+	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
 
 	log.Printf("flood starting addr=%s megabytes=%d\n", req.RemoteAddr, m)
 	start := time.Now()
 	status := "finished"
-	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
 	written, err := io.Copy(w, common.LimitedRandomGen(m*consts.Megabyte))
 
+	if err != nil {
+		status = "aborted"
+	}
+	duration := time.Since(start)
+	megabytes := float64(written) / consts.Megabyte
+	mbs := megabytes / duration.Seconds()
+	removeConnection(uint64(megabytes), 0)
+	log.Printf("flood %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, req.RemoteAddr, duration, megabytes, mbs)
+}
+
+func TimeFlood(w http.ResponseWriter, req *http.Request) {
+	addConnection()
+
+	ss := req.FormValue("s")
+	if ss == "" {
+		ss = "10"
+	}
+	s, err := strconv.ParseUint(ss, 10, 0)
+	if err != nil {
+		s = 10
+	}
+
+	log.Printf("flood starting addr=%s seconds=%d\n", req.RemoteAddr, s)
+	start := time.Now()
+	status := "finished"
+	written, err := io.Copy(w, common.TimedRandomGen(s))
 	if err != nil {
 		status = "aborted"
 	}
