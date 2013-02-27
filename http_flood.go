@@ -88,28 +88,11 @@ func Hello(w http.ResponseWriter, req *http.Request) {
 	indexTemplate.Execute(w, serverStatus)
 }
 
-func Flood(w http.ResponseWriter, req *http.Request) {
-	s := req.FormValue("s")
-	if s != "" {
-		TimeFlood(w, req)
-		return
-	}
+func FloodHelper(w http.ResponseWriter, req *http.Request, reader io.Reader) {
 	addConnection()
-
-	ms := req.FormValue("m")
-	if ms == "" {
-		ms = "1"
-	}
-	m, err := strconv.ParseUint(ms, 10, 0)
-	if err != nil {
-		m = 1
-	}
-	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
-
-	log.Printf("flood starting addr=%s megabytes=%d\n", req.RemoteAddr, m)
 	start := time.Now()
 	status := "finished"
-	written, err := io.Copy(w, common.LimitedRandomGen(m*consts.Megabyte))
+	written, err := io.Copy(w, reader)
 
 	if err != nil {
 		status = "aborted"
@@ -121,9 +104,27 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 	log.Printf("flood %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, req.RemoteAddr, duration, megabytes, mbs)
 }
 
-func TimeFlood(w http.ResponseWriter, req *http.Request) {
-	addConnection()
+func Flood(w http.ResponseWriter, req *http.Request) {
+	s := req.FormValue("s")
+	if s != "" {
+		TimeFlood(w, req)
+		return
+	}
 
+	ms := req.FormValue("m")
+	if ms == "" {
+		ms = "1"
+	}
+	m, err := strconv.ParseUint(ms, 10, 0)
+	if err != nil {
+		m = 1
+	}
+	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
+	log.Printf("flood starting addr=%s megabytes=%d\n", req.RemoteAddr, m)
+	FloodHelper(w, req, common.LimitedRandomGen(m*consts.Megabyte))
+}
+
+func TimeFlood(w http.ResponseWriter, req *http.Request) {
 	ss := req.FormValue("s")
 	if ss == "" {
 		ss = "10"
@@ -134,17 +135,7 @@ func TimeFlood(w http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Printf("flood starting addr=%s seconds=%d\n", req.RemoteAddr, s)
-	start := time.Now()
-	status := "finished"
-	written, err := io.Copy(w, common.TimedRandomGen(s))
-	if err != nil {
-		status = "aborted"
-	}
-	duration := time.Since(start)
-	megabytes := float64(written) / consts.Megabyte
-	mbs := megabytes / duration.Seconds()
-	removeConnection(uint64(megabytes), 0)
-	log.Printf("flood %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, req.RemoteAddr, duration, megabytes, mbs)
+	FloodHelper(w, req, common.TimedRandomGen(s))
 }
 
 func Upload(w http.ResponseWriter, req *http.Request) {
