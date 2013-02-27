@@ -14,10 +14,10 @@ import (
 
 func download(host string, megs uint64, seconds uint64) {
 	status := "finished"
-    url := fmt.Sprintf("http://%s/flood?m=%d", host, megs)
-    if(seconds != 0) {
-        url = fmt.Sprintf("http://%s/flood?s=%d", host, seconds)
-    }
+	url := fmt.Sprintf("http://%s/flood?m=%d", host, megs)
+	if seconds != 0 {
+		url = fmt.Sprintf("http://%s/flood?s=%d", host, seconds)
+	}
 
 	start := time.Now()
 	resp, err := http.Get(url)
@@ -39,23 +39,23 @@ func download(host string, megs uint64, seconds uint64) {
 
 func upload(host string, megs uint64, seconds uint64) {
 	url := fmt.Sprintf("http://%s/upload", host)
-    var reader io.Reader
-    if(seconds !=0 ){
-        reader = common.TimedRandomGen(seconds)
-    } else {
-        reader = common.LimitedRandomGen(megs*consts.Megabyte)
-    }
+	var reader io.Reader
+	if seconds != 0 {
+		reader = common.TimedRandomGen(seconds)
+	} else {
+		reader = common.LimitedRandomGen(megs * consts.Megabyte)
+	}
 
-	resp, err := http.Post(url, "application/octet-stream", reader);
+	resp, err := http.Post(url, "application/octet-stream", reader)
 	if err != nil {
 		log.Fatal(err)
 	}
-    body, err := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-    log.Printf("%s", body)
+	log.Printf("%s", body)
 }
 
 func notify(c chan bool, f func()) {
@@ -64,7 +64,7 @@ func notify(c chan bool, f func()) {
 }
 
 func main() {
-	seconds   := flag.Uint64("seconds", 10, "seconds to download")
+	seconds := flag.Uint64("seconds", 10, "seconds to download")
 	megabytes := flag.Uint64("megs", 0, "megabytes to download")
 	host := flag.String("host", "localhost:7070", "Host to connect to")
 	fd := flag.Bool("full", false, "Download and upload at the same time")
