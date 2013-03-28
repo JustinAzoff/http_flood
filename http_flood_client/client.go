@@ -70,6 +70,10 @@ func main() {
 	fd := flag.Bool("full", false, "Download and upload at the same time")
 	flag.Parse()
 
+	if *megabytes != 0 {
+		*seconds = 0
+	}
+
 	if *fd {
 		c := make(chan bool, 2)
 		go notify(c, func() { download(*host, *megabytes, *seconds) })
