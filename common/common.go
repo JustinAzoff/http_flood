@@ -41,17 +41,23 @@ func LimitedRandomGen(n uint64) io.Reader {
 func NewTimedReader(r io.Reader, n uint64) io.Reader {
 	start := time.Now()
 	end := start.Add(time.Duration(n) * time.Second)
-	return &TimedReader{r, end}
+	return &TimedReader{r, end, 10, 0}
 }
 
 type TimedReader struct {
-	R   io.Reader // underlying reader
-	End time.Time //When to stop reading
+	R             io.Reader // underlying reader
+	End           time.Time //When to stop reading
+	CheckInterval int       //how often to check the time
+	Calls         int       //how many calls have been made so far
 }
 
 func (l *TimedReader) Read(p []byte) (n int, err error) {
-	if time.Now().After(l.End) {
-		return 0, io.EOF
+	l.Calls++
+	if l.Calls == l.CheckInterval {
+		l.Calls = 0
+		if time.Now().After(l.End) {
+			return 0, io.EOF
+		}
 	}
 	n, err = l.R.Read(p)
 	return
