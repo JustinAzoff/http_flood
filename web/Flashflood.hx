@@ -12,6 +12,7 @@ class Flashflood
     static function main()
     {
         ExternalInterface.addCallback("start", start);
+        trace("Ready");
     }
     static function start(seconds)
     {
@@ -63,7 +64,7 @@ class SpeedTester
         stop_time = Date.now();
         var elapsed = (stop_time.getTime() - start_time.getTime())/1000;
         var bps = this.bytesread / elapsed;
-        var MBps = Math.round(bps/1024/1024);
+        var MBps = Math.round(100*bps/1024/1024)/100;
         trace("Read " + this.bytesread + " bytes in " + elapsed + ". " + MBps + " MB/s");
         ExternalInterface.call("result", MBps);
     }
