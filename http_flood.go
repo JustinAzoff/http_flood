@@ -76,12 +76,12 @@ var indexTemplate = template.Must(template.New("").Parse(`
  <li><a href="/flood?s=10">10 seconds</a></li>
  <li><a href="/flood?s=60">60 seconds</a></li>
 </ul>
-</body>
 <p> Current connections: {{.Connections}} </p>
 <p> Total Downloads: {{.Downloads}} </p>
 <p> Total Uploads: {{.Uploads}} </p>
 <p> Megabytes Downloaded: {{.DownloadMegs}} </p>
 <p> Megabytes Uploaded: {{.UploadMegs}} </p>
+</body>
 </html>`))
 
 func Hello(w http.ResponseWriter, req *http.Request) {
