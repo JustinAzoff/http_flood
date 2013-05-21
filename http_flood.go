@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"strconv"
 	"time"
+    "./web"
 )
 
 type serverStatusStruct struct {
@@ -62,27 +63,7 @@ func connectionTracker() {
 	}
 }
 
-var indexTemplate = template.Must(template.New("").Parse(`
-<html>
-<head><title>HTTP Flood Server </title></head>
-<body>
-<h1>HTTP Flood Server</h1>
-<ul>
- <li><a href="/flood?m=1">1 megabyte file</a></li>
- <li><a href="/flood?m=10">10 megabyte file</a></li>
- <li><a href="/flood?m=100">100 megabyte file</a></li>
- <li><a href="/flood?m=1024">1 gigabyte file</a></li>
- <li><a href="/flood?m=10240">10 gigabyte file</a></li>
- <li><a href="/flood?s=10">10 seconds</a></li>
- <li><a href="/flood?s=60">60 seconds</a></li>
-</ul>
-<p> Current connections: {{.Connections}} </p>
-<p> Total Downloads: {{.Downloads}} </p>
-<p> Total Uploads: {{.Uploads}} </p>
-<p> Megabytes Downloaded: {{.DownloadMegs}} </p>
-<p> Megabytes Uploaded: {{.UploadMegs}} </p>
-</body>
-</html>`))
+var indexTemplate = template.Must(template.New("").Parse(string(web.Index_html())))
 
 func Hello(w http.ResponseWriter, req *http.Request) {
 	indexTemplate.Execute(w, serverStatus)
@@ -174,6 +155,10 @@ func main() {
 	myHandler.HandleFunc("/", Hello)
 	myHandler.HandleFunc("/flood", Flood)
 	myHandler.HandleFunc("/upload", Upload)
+	myHandler.HandleFunc("/Flashflood.swf", func(w http.ResponseWriter, r *http.Request) {
+		w.Write(web.Flashflood_swf())
+	})
+
 	log.Printf("Listening on %s\n", *addr)
 	go connectionTracker()
 	log.Fatal(s.ListenAndServe())
