@@ -11,6 +11,25 @@
  <li><a href="/flood?s=10">10 seconds</a></li>
  <li><a href="/flood?s=60">60 seconds</a></li>
 </ul>
+
+<script>
+    var start = function() {
+        var seconds = document.getElementById("seconds").value;
+        document.getElementById("flashflood").start(seconds);  
+    };
+    var result = function(mbps) {
+        document.getElementById("result").innerHTML=mbps;
+    };
+</script>
+
+<embed src="Flashflood.swf" quality="high" bgcolor="#ffffff" width="600" height="300" id="flashflood" align="middle" allowScriptAccess="sameDomain" allowFullScreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />  
+
+<br>
+<input type="text" id="seconds" value="5">
+<button onClick="start();">Start</button>
+
+<h2>Speed <span id="result"></span> MB/s</h2>
+
 <h2>Status</h2>
 <p> Current connections: {{.Connections}} </p>
 <p> Total Downloads: {{.Downloads}} </p>
