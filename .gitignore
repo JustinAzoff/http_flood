@@ -1,5 +1,8 @@
 http_flood
 http_flood_client/http_flood_client
+web/Flashflood.swf
+web/Flashflood.swf.go
+web/index.html.go
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
