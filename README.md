@@ -55,6 +55,6 @@ Test using wget:
 API
 ===
 
-    * GET /flood?m=1024  -- Download 1024 megabytes
-    * GET /flood?s=10    -- Download for 10 seconds
-    * POST /upload       -- Upload arbitrary data
+* GET /flood?m=1024  -- Download 1024 megabytes
+* GET /flood?s=10    -- Download for 10 seconds
+* POST /upload       -- Upload arbitrary data
