@@ -14,7 +14,7 @@ It logs information like
 Building
 ========
 
-    go install github.com/jteeuwen/go-bindata
+    go get github.com/jteeuwen/go-bindata
     make
 
 Usage
