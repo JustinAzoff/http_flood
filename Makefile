@@ -7,11 +7,11 @@ web/Flashflood.swf: web/Flashflood.hx
 
 web/index.html.go: web/index.html
 	rm -f web/index.html.go
-	go-bindata -f Index_html -p web -i web/index.html
+	go-bindata -func Index_html -pkg web web/index.html
 
 web/Flashflood.swf.go: web/Flashflood.swf
 	rm -f web/Flashflood.swf.go
-	go-bindata -f Flashflood_swf -p web -i web/Flashflood.swf
+	go-bindata -func Flashflood_swf -pkg web web/Flashflood.swf
 
 http_flood: http_flood.go common/common.go consts/consts.go web/index.html.go web/Flashflood.swf.go
 	go build http_flood.go
