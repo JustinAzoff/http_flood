@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"runtime"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -24,6 +25,10 @@ var downloads = expvar.NewInt("downloads")
 var uploads = expvar.NewInt("uploads")
 var download_megs = expvar.NewInt("download_megs")
 var upload_megs = expvar.NewInt("upload_megs")
+
+func extractIP(s string) string {
+	return strings.Split(s, ":")[0]
+}
 
 func addConnection() {
 	connections.Add(1)
@@ -66,7 +71,7 @@ func FloodHelper(w http.ResponseWriter, req *http.Request, reader io.Reader) {
 	megabytes := float64(written) / consts.Megabyte
 	mbs := megabytes / duration.Seconds()
 	removeConnection(int64(megabytes), 0)
-	log.Printf("flood %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, req.RemoteAddr, duration, megabytes, mbs)
+	log.Printf("flood %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, extractIP(req.RemoteAddr), duration, megabytes, mbs)
 }
 
 func Flood(w http.ResponseWriter, req *http.Request) {
@@ -85,7 +90,7 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 		m = 1
 	}
 	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
-	log.Printf("flood starting addr=%s megabytes=%d\n", req.RemoteAddr, m)
+	log.Printf("flood starting addr=%s megabytes=%d\n", extractIP(req.RemoteAddr), m)
 	FloodHelper(w, req, common.LimitedRandomGen(m*consts.Megabyte))
 }
 
@@ -99,14 +104,14 @@ func TimeFlood(w http.ResponseWriter, req *http.Request) {
 		s = 10
 	}
 
-	log.Printf("flood starting addr=%s seconds=%d\n", req.RemoteAddr, s)
+	log.Printf("flood starting addr=%s seconds=%d\n", extractIP(req.RemoteAddr), s)
 	FloodHelper(w, req, common.TimedRandomGen(s))
 }
 
 func Upload(w http.ResponseWriter, req *http.Request) {
 	addConnection()
 
-	log.Printf("upload starting addr=%s\n", req.RemoteAddr)
+	log.Printf("upload starting addr=%s\n", extractIP(req.RemoteAddr))
 	start := time.Now()
 	status := "finished"
 
@@ -119,7 +124,7 @@ func Upload(w http.ResponseWriter, req *http.Request) {
 	megabytes := float64(written) / consts.Megabyte
 	removeConnection(0, int64(megabytes))
 	mbs := megabytes / duration.Seconds()
-	message := fmt.Sprintf("upload %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, req.RemoteAddr, duration, megabytes, mbs)
+	message := fmt.Sprintf("upload %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, extractIP(req.RemoteAddr), duration, megabytes, mbs)
 	log.Print(message)
 	io.WriteString(w, message)
 }
