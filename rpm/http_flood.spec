@@ -1,5 +1,5 @@
 Name:           http_flood
-Version:        0.2
+Version:        0.3
 Release:        1%{?dist}
 Summary:        HTTP Network Performance test program
 
@@ -11,6 +11,7 @@ Source0:        https://github.com/JustinAzoff/http_flood/archive/v0.2.tar.gz
 BuildRequires:  golang
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
+%define  debug_package %{nil}
 
 %description
 http server that floods the client with random data. It has endpoints for
@@ -35,8 +36,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
+/usr/bin/http_flood
+/usr/bin/http_flood_client
 %doc
-
-
 
 %changelog
