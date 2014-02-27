@@ -1,5 +1,5 @@
 Name:           http_flood
-Version:        0.1
+Version:        0.2
 Release:        1%{?dist}
 Summary:        HTTP Network Performance test program
 
