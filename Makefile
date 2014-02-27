@@ -21,3 +21,7 @@ http_flood_client/http_flood_client: http_flood_client/client.go common/common.g
 
 run: http_flood
 	./http_flood
+
+install: all
+	install -d ${DESTDIR}/bin/
+	install http_flood http_flood_client/http_flood_client ${DESTDIR}/bin/
