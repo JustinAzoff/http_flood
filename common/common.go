@@ -1,8 +1,8 @@
 package common
 
 import (
-	"../consts"
 	"crypto/rand"
+	"github.com/JustinAzoff/http_flood/consts"
 	"io"
 	"time"
 )

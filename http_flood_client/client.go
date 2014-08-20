@@ -1,10 +1,10 @@
 package main
 
 import (
-	"../common"
-	"../consts"
 	"flag"
 	"fmt"
+	"github.com/JustinAzoff/http_flood/common"
+	"github.com/JustinAzoff/http_flood/consts"
 	"io"
 	"io/ioutil"
 	"log"
