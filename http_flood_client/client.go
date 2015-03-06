@@ -3,13 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/JustinAzoff/http_flood/common"
-	"github.com/JustinAzoff/http_flood/consts"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/JustinAzoff/http_flood/common"
+	"github.com/JustinAzoff/http_flood/consts"
 )
 
 func download(host string, megs uint64, seconds uint64) {

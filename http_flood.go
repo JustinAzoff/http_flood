@@ -4,9 +4,6 @@ import (
 	"expvar"
 	"flag"
 	"fmt"
-	"github.com/JustinAzoff/http_flood/common"
-	"github.com/JustinAzoff/http_flood/consts"
-	"github.com/JustinAzoff/http_flood/web"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -16,15 +13,19 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/JustinAzoff/http_flood/common"
+	"github.com/JustinAzoff/http_flood/consts"
+	"github.com/JustinAzoff/http_flood/web"
 )
 
-type Context map[string]interface{}
+type context map[string]interface{}
 
 var connections = expvar.NewInt("connections")
 var downloads = expvar.NewInt("downloads")
 var uploads = expvar.NewInt("uploads")
-var download_megs = expvar.NewInt("download_megs")
-var upload_megs = expvar.NewInt("upload_megs")
+var downloadMegs = expvar.NewInt("downloadMegs")
+var uploadMegs = expvar.NewInt("uploadMegs")
 
 func extractIP(s string) string {
 	return strings.Split(s, ":")[0]
@@ -39,26 +40,26 @@ func removeConnection(downmegs int64, upmegs int64) {
 
 	if downmegs != 0 {
 		downloads.Add(1)
-		download_megs.Add(downmegs)
+		downloadMegs.Add(downmegs)
 	}
 	if upmegs != 0 {
 		uploads.Add(1)
-		upload_megs.Add(upmegs)
+		uploadMegs.Add(upmegs)
 	}
 }
 
 var indexTemplate = template.Must(template.New("").Parse(string(web.Index_html())))
 
-func Hello(w http.ResponseWriter, req *http.Request) {
-	indexTemplate.Execute(w, Context{"Connections": connections,
+func handleIndex(w http.ResponseWriter, req *http.Request) {
+	indexTemplate.Execute(w, context{"Connections": connections,
 		"Downloads":    downloads,
 		"Uploads":      uploads,
-		"DownloadMegs": download_megs,
-		"UploadMegs":   upload_megs,
+		"DownloadMegs": downloadMegs,
+		"UploadMegs":   uploadMegs,
 	})
 }
 
-func FloodHelper(w http.ResponseWriter, req *http.Request, reader io.Reader) {
+func floodHelper(w http.ResponseWriter, req *http.Request, reader io.Reader) {
 	addConnection()
 	start := time.Now()
 	status := "finished"
@@ -74,10 +75,10 @@ func FloodHelper(w http.ResponseWriter, req *http.Request, reader io.Reader) {
 	log.Printf("flood %s addr=%s duration=%s megabytes=%.1f speed=%.1fMB/s\n", status, extractIP(req.RemoteAddr), duration, megabytes, mbs)
 }
 
-func Flood(w http.ResponseWriter, req *http.Request) {
+func handleFlood(w http.ResponseWriter, req *http.Request) {
 	s := req.FormValue("s")
 	if s != "" {
-		TimeFlood(w, req)
+		handleTimeFlood(w, req)
 		return
 	}
 
@@ -91,10 +92,10 @@ func Flood(w http.ResponseWriter, req *http.Request) {
 	}
 	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
 	log.Printf("flood starting addr=%s megabytes=%d\n", extractIP(req.RemoteAddr), m)
-	FloodHelper(w, req, common.LimitedRandomGen(m*consts.Megabyte))
+	floodHelper(w, req, common.LimitedRandomGen(m*consts.Megabyte))
 }
 
-func TimeFlood(w http.ResponseWriter, req *http.Request) {
+func handleTimeFlood(w http.ResponseWriter, req *http.Request) {
 	ss := req.FormValue("s")
 	if ss == "" {
 		ss = "10"
@@ -105,10 +106,10 @@ func TimeFlood(w http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Printf("flood starting addr=%s seconds=%d\n", extractIP(req.RemoteAddr), s)
-	FloodHelper(w, req, common.TimedRandomGen(s))
+	floodHelper(w, req, common.TimedRandomGen(s))
 }
 
-func Upload(w http.ResponseWriter, req *http.Request) {
+func handleUpload(w http.ResponseWriter, req *http.Request) {
 	addConnection()
 
 	log.Printf("upload starting addr=%s\n", extractIP(req.RemoteAddr))
@@ -155,9 +156,9 @@ func main() {
 		WriteTimeout:   60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	myHandler.HandleFunc("/", Hello)
-	myHandler.HandleFunc("/flood", Flood)
-	myHandler.HandleFunc("/upload", Upload)
+	myHandler.HandleFunc("/", handleIndex)
+	myHandler.HandleFunc("/flood", handleFlood)
+	myHandler.HandleFunc("/upload", handleUpload)
 	myHandler.HandleFunc("/Flashflood.swf", func(w http.ResponseWriter, r *http.Request) {
 		w.Write(web.Flashflood_swf())
 	})

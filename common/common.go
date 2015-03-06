@@ -2,24 +2,27 @@ package common
 
 import (
 	"crypto/rand"
-	"github.com/JustinAzoff/http_flood/consts"
 	"io"
 	"time"
+
+	"github.com/JustinAzoff/http_flood/consts"
 )
 
+// A RandomGen is an io.Reader that returns random data
 type RandomGen struct {
 	buf []byte
 }
 
+// NewRandomGen creates a new RandomGen
 func NewRandomGen() *RandomGen {
-	random_bytes := make([]byte, consts.Blocksize)
-	_, err := rand.Read(random_bytes)
+	randomBytes := make([]byte, consts.Blocksize)
+	_, err := rand.Read(randomBytes)
 	if err != nil {
 		return nil
 	}
 
 	return &RandomGen{
-		buf: random_bytes,
+		buf: randomBytes,
 	}
 }
 
@@ -34,16 +37,19 @@ func (r *RandomGen) Read(p []byte) (n int, err error) {
 	return toread, nil
 }
 
+// LimitedRandomGen returns a RandomGen of a specific Size
 func LimitedRandomGen(n uint64) io.Reader {
 	return io.LimitReader(NewRandomGen(), int64(n))
 }
 
+// NewTimedReader creates a new TimedReader
 func NewTimedReader(r io.Reader, n uint64) io.Reader {
 	start := time.Now()
 	end := start.Add(time.Duration(n) * time.Second)
 	return &TimedReader{r, end, 10, 0}
 }
 
+//TimedReader is similar to an io.LimitReader but limits based on time, not size
 type TimedReader struct {
 	R             io.Reader // underlying reader
 	End           time.Time //When to stop reading
@@ -63,6 +69,7 @@ func (l *TimedReader) Read(p []byte) (n int, err error) {
 	return
 }
 
+// TimedRandomGen returns a RandomGen for a specific time duration
 func TimedRandomGen(s uint64) io.Reader {
 	return NewTimedReader(NewRandomGen(), s)
 }

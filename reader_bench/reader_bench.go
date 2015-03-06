@@ -1,16 +1,17 @@
 package main
 
 import (
-	"./common"
-	"./consts"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"time"
+
+	"github.com/JustinAzoff/http_flood/common"
+	"github.com/JustinAzoff/http_flood/consts"
 )
 
-func test_helper(reader io.Reader) {
+func testHelper(reader io.Reader) {
 	start := time.Now()
 	written, err := io.Copy(ioutil.Discard, reader)
 	if err != nil {
@@ -22,17 +23,17 @@ func test_helper(reader io.Reader) {
 	fmt.Printf("%f Megabytes in %f seconds. %.1f MB/s\n", megabytes, duration.Seconds(), mbs)
 }
 
-func size_limited(megabytes uint64) {
+func sizeLimited(megabytes uint64) {
 	sl := common.LimitedRandomGen(megabytes * consts.Megabyte)
-	test_helper(sl)
+	testHelper(sl)
 }
 
-func time_limited(seconds uint64) {
+func timeLimited(seconds uint64) {
 	tl := common.TimedRandomGen(seconds)
-	test_helper(tl)
+	testHelper(tl)
 }
 
 func main() {
-	size_limited(100000)
-	time_limited(4)
+	sizeLimited(200000)
+	timeLimited(4)
 }
