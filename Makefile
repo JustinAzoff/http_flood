@@ -1,4 +1,4 @@
-all: static http_flood http_flood_client/http_flood_client
+all: static http_flood
 
 static: web/index.html.go web/Flashflood.swf.go
 
@@ -13,14 +13,11 @@ web/Flashflood.swf.go: web/Flashflood.swf
 	rm -f web/Flashflood.swf.go
 	go-bindata -func Flashflood_swf -pkg web web/Flashflood.swf
 
-http_flood: http_flood.go common/common.go consts/consts.go web/index.html.go web/Flashflood.swf.go
-	go build http_flood.go
-
-http_flood_client/http_flood_client: http_flood_client/client.go common/common.go consts/consts.go
-	cd http_flood_client/ && go build
+http_flood: main.go client.go server.go randomreader/randomreader.go consts/consts.go web/index.html.go web/Flashflood.swf.go
+	go build
 
 run: http_flood
-	./http_flood
+	./http_flood server
 
 install: all
 	install -d ${DESTDIR}/usr/bin/

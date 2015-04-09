@@ -7,8 +7,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/JustinAzoff/http_flood/common"
 	"github.com/JustinAzoff/http_flood/consts"
+	"github.com/JustinAzoff/http_flood/randomreader"
 )
 
 func testHelper(reader io.Reader) {
@@ -24,12 +24,12 @@ func testHelper(reader io.Reader) {
 }
 
 func sizeLimited(megabytes uint64) {
-	sl := common.LimitedRandomGen(megabytes * consts.Megabyte)
+	sl := randomreader.LimitedRandomGen(megabytes * consts.Megabyte)
 	testHelper(sl)
 }
 
 func timeLimited(seconds uint64) {
-	tl := common.TimedRandomGen(seconds)
+	tl := randomreader.TimedRandomGen(seconds)
 	testHelper(tl)
 }
 

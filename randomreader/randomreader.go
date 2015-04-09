@@ -1,4 +1,4 @@
-package common
+package randomreader
 
 import (
 	"crypto/rand"

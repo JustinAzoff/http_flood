@@ -9,13 +9,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/JustinAzoff/http_flood/common"
 	"github.com/JustinAzoff/http_flood/consts"
+	"github.com/JustinAzoff/http_flood/randomreader"
 	"github.com/JustinAzoff/http_flood/web"
 )
 
@@ -92,7 +91,7 @@ func handleFlood(w http.ResponseWriter, req *http.Request) {
 	}
 	w.Header().Set("Content-length", strconv.FormatUint(m*consts.Megabyte, 10))
 	log.Printf("flood starting addr=%s megabytes=%d\n", extractIP(req.RemoteAddr), m)
-	floodHelper(w, req, common.LimitedRandomGen(m*consts.Megabyte))
+	floodHelper(w, req, randomreader.LimitedRandomGen(m*consts.Megabyte))
 }
 
 func handleTimeFlood(w http.ResponseWriter, req *http.Request) {
@@ -106,7 +105,7 @@ func handleTimeFlood(w http.ResponseWriter, req *http.Request) {
 	}
 
 	log.Printf("flood starting addr=%s seconds=%d\n", extractIP(req.RemoteAddr), s)
-	floodHelper(w, req, common.TimedRandomGen(s))
+	floodHelper(w, req, randomreader.TimedRandomGen(s))
 }
 
 func handleUpload(w http.ResponseWriter, req *http.Request) {
@@ -144,8 +143,7 @@ func expvarHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "\n}\n")
 }
 
-func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU())
+func serverMain() {
 	addr := flag.String("addr", ":7070", "Address to bind to")
 	flag.Parse()
 	myHandler := http.NewServeMux()

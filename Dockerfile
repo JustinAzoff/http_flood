@@ -13,4 +13,4 @@ RUN go build
 RUN find /gopath
 
 EXPOSE 7070
-ENTRYPOINT ["/gopath/bin/http_flood"]
+ENTRYPOINT ["/gopath/bin/http_flood", "server"]

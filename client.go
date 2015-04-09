@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/JustinAzoff/http_flood/common"
 	"github.com/JustinAzoff/http_flood/consts"
+	"github.com/JustinAzoff/http_flood/randomreader"
 )
 
 func download(host string, megs uint64, seconds uint64) {
@@ -42,9 +42,9 @@ func upload(host string, megs uint64, seconds uint64) {
 	url := fmt.Sprintf("http://%s/upload", host)
 	var reader io.Reader
 	if seconds != 0 {
-		reader = common.TimedRandomGen(seconds)
+		reader = randomreader.TimedRandomGen(seconds)
 	} else {
-		reader = common.LimitedRandomGen(megs * consts.Megabyte)
+		reader = randomreader.LimitedRandomGen(megs * consts.Megabyte)
 	}
 
 	resp, err := http.Post(url, "application/octet-stream", reader)
@@ -64,11 +64,11 @@ func notify(c chan bool, f func()) {
 	c <- true
 }
 
-func main() {
+func clientMain() {
 	seconds := flag.Uint64("seconds", 10, "seconds to download")
 	megabytes := flag.Uint64("megs", 0, "megabytes to download")
 	host := flag.String("host", "localhost:7070", "Host to connect to")
-	fd := flag.Bool("full", false, "Download and upload at the same time")
+	fd := flag.Bool("full", false, "Full duplex test: download and upload at the same time")
 	flag.Parse()
 
 	if *megabytes != 0 {
