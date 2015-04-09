@@ -11,7 +11,7 @@ It logs information like
     2013/05/22 20:05:18 upload starting addr=127.0.0.1:50632
     2013/05/22 20:05:23 upload finished addr=127.0.0.1:50632 duration=4.999599s megabytes=4244.6 speed=849.0MB/s
 
-Building
+Building (from scratch)
 ========
 
     go get github.com/jteeuwen/go-bindata
@@ -22,18 +22,18 @@ Usage
 
 Start http_flood:
 
-    $ ./http_flood
+    $ ./http_flood server
     2013/05/22 20:04:09 Listening on :7070
 
-Hit it with http_flood_client
+Hit it with http_flood client
 
-    $ ./http_flood_client/http_flood_client 
+    $ ./http_flood client
     2013/05/22 20:04:43 download finished duration=10.010801s megabytes=22094.3 speed=2207.1MB/s
     2013/05/22 20:04:53 upload finished addr=127.0.0.1:50630 duration=9.999803s megabytes=19622.1 speed=1962.3MB/s
 
 Run a full duplex test:
 
-    $ ./http_flood_client/http_flood_client --full --seconds 5
+    $ ./http_flood client --full --seconds 5
     2013/05/22 20:05:23 upload finished addr=127.0.0.1:50632 duration=4.999599s megabytes=4244.6 speed=849.0MB/s
     2013/05/22 20:05:23 download finished duration=5.01283s megabytes=3859.3 speed=769.9MB/s
 
