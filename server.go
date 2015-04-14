@@ -26,8 +26,9 @@ var uploads = expvar.NewInt("uploads")
 var downloadMegs = expvar.NewInt("downloadMegs")
 var uploadMegs = expvar.NewInt("uploadMegs")
 
-func extractIP(s string) string {
-	return strings.Split(s, ":")[0]
+func extractIP(addrPort string) string {
+	lastColon := strings.LastIndex(addrPort, ":")
+	return addrPort[0:lastColon]
 }
 
 func addConnection() {
