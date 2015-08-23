@@ -1,4 +1,4 @@
-package main
+package floodlib
 
 import (
 	"expvar"
@@ -144,12 +144,11 @@ func expvarHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "\n}\n")
 }
 
-func serverMain() {
-	addr := flag.String("addr", ":7070", "Address to bind to")
+func RunServer(bindAddr string) {
 	flag.Parse()
 	myHandler := http.NewServeMux()
 	s := &http.Server{
-		Addr:           *addr,
+		Addr:           bindAddr,
 		Handler:        myHandler,
 		ReadTimeout:    60 * time.Second,
 		WriteTimeout:   60 * time.Second,
@@ -163,6 +162,6 @@ func serverMain() {
 	})
 	myHandler.HandleFunc("/debug/vars", expvarHandler)
 
-	log.Printf("Listening on %s\n", *addr)
+	log.Printf("Listening on %s\n", bindAddr)
 	log.Fatal(s.ListenAndServe())
 }

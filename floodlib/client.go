@@ -1,7 +1,6 @@
-package main
+package floodlib
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -64,26 +63,20 @@ func notify(c chan bool, f func()) {
 	c <- true
 }
 
-func clientMain() {
-	seconds := flag.Uint64("seconds", 10, "seconds to download")
-	megabytes := flag.Uint64("megs", 0, "megabytes to download")
-	host := flag.String("host", "localhost:7070", "Host to connect to")
-	fd := flag.Bool("full", false, "Full duplex test: download and upload at the same time")
-	flag.Parse()
-
-	if *megabytes != 0 {
-		*seconds = 0
+func RunClient(host string, seconds, megabytes uint64, full_duplex bool) {
+	if megabytes != 0 {
+		seconds = 0
 	}
 
-	if *fd {
+	if full_duplex {
 		c := make(chan bool, 2)
-		go notify(c, func() { download(*host, *megabytes, *seconds) })
-		go notify(c, func() { upload(*host, *megabytes, *seconds) })
+		go notify(c, func() { download(host, megabytes, seconds) })
+		go notify(c, func() { upload(host, megabytes, seconds) })
 		<-c
 		<-c
 	} else {
-		download(*host, *megabytes, *seconds)
-		upload(*host, *megabytes, *seconds)
+		download(host, megabytes, seconds)
+		upload(host, megabytes, seconds)
 	}
 
 }
